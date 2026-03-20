@@ -5,7 +5,8 @@ import {
   FolderKanban, 
   Settings, 
   TerminalSquare,
-  LogOut
+  LogOut,
+  Plus
 } from "lucide-react";
 import { cn } from "./GlowingButton";
 import { motion } from "framer-motion";
@@ -18,6 +19,8 @@ export function Layout({ children }: { children: ReactNode }) {
     { icon: FolderKanban, label: "Projects", href: "/app/projects" },
     { icon: Settings, label: "Settings", href: "/app/settings" },
   ];
+
+  const isNewBuildActive = location === "/app/new-build";
 
   return (
     <div className="min-h-screen bg-background text-foreground flex overflow-hidden">
@@ -32,7 +35,29 @@ export function Layout({ children }: { children: ReactNode }) {
           </span>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        <nav className="flex-1 px-4 py-4 space-y-1">
+          {/* New Build CTA */}
+          <Link href="/app/new-build" className="block mb-4">
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className={cn(
+                "relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 overflow-hidden group",
+                isNewBuildActive
+                  ? "bg-primary shadow-[0_0_24px_-4px_rgba(124,58,237,0.6)]"
+                  : "bg-primary/80 hover:bg-primary shadow-[0_0_16px_-4px_rgba(124,58,237,0.4)] hover:shadow-[0_0_24px_-4px_rgba(124,58,237,0.6)]"
+              )}
+            >
+              <div className="absolute inset-0 border-t border-white/20 rounded-xl pointer-events-none" />
+              <Plus className="w-5 h-5 text-white relative z-10" />
+              <span className="font-semibold text-white relative z-10">New Build</span>
+            </motion.div>
+          </Link>
+
+          <div className="pt-1 pb-2">
+            <p className="px-4 text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold">Navigation</p>
+          </div>
+
           {navItems.map((item) => {
             const isActive = location === item.href || (item.href !== '/app' && location.startsWith(item.href));
             return (

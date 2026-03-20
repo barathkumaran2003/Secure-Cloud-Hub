@@ -9,6 +9,7 @@ import Projects from "@/pages/Projects";
 import ProjectDetails from "@/pages/ProjectDetails";
 import BuildDetails from "@/pages/BuildDetails";
 import Settings from "@/pages/Settings";
+import NewBuild from "@/pages/NewBuild";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -25,6 +26,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/app" component={Dashboard} />
+      <Route path="/app/new-build" component={NewBuild} />
       <Route path="/app/projects" component={Projects} />
       <Route path="/app/projects/:id" component={ProjectDetails} />
       <Route path="/app/builds/:id" component={BuildDetails} />
