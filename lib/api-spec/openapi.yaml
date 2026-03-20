@@ -1,15 +1,18 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: AutoBuilder AI API specification
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: projects
+    description: Project management
+  - name: builds
+    description: Build management
 paths:
   /healthz:
     get:
@@ -24,6 +27,131 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a new project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectRequest"
+      responses:
+        "201":
+          description: Project created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get project by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Project not found
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Project deleted
+  /projects/{id}/builds:
+    get:
+      operationId: listBuilds
+      tags: [builds]
+      summary: List builds for a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of builds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Build"
+    post:
+      operationId: triggerBuild
+      tags: [builds]
+      summary: Trigger a new build
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TriggerBuildRequest"
+      responses:
+        "201":
+          description: Build triggered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Build"
+  /builds/{id}:
+    get:
+      operationId: getBuild
+      tags: [builds]
+      summary: Get build details
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Build details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Build"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +161,102 @@ components:
           type: string
       required:
         - status
-
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [frontend, backend, fullstack]
+        status:
+          type: string
+          enum: [active, archived]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        buildsCount:
+          type: integer
+        lastBuildStatus:
+          type: string
+          enum: [pending, building, success, failed]
+          nullable: true
+      required:
+        - id
+        - name
+        - type
+        - status
+        - createdAt
+        - updatedAt
+        - buildsCount
+    CreateProjectRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum: [frontend, backend, fullstack]
+      required:
+        - name
+        - type
+    Build:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        status:
+          type: string
+          enum: [pending, building, success, failed]
+        targetPlatform:
+          type: string
+          enum: [exe, apk, both]
+        progress:
+          type: integer
+          minimum: 0
+          maximum: 100
+        logs:
+          type: string
+          nullable: true
+        downloadUrl:
+          type: string
+          nullable: true
+        fileSize:
+          type: string
+          nullable: true
+        duration:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectId
+        - status
+        - targetPlatform
+        - progress
+        - createdAt
+        - updatedAt
+    TriggerBuildRequest:
+      type: object
+      properties:
+        targetPlatform:
+          type: string
+          enum: [exe, apk, both]
+      required:
+        - targetPlatform

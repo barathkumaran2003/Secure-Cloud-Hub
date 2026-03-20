@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For fluid page transitions, glowing hover effects, and animated progress bars"
+  "recharts": "For modern dashboard analytics charts"
+  "date-fns": "For formatting build timestamps"
+  "lucide-react": "For beautiful consistent iconography"
+  "clsx": "For merging tailwind classes in custom components"
+  "tailwind-merge": "For safely merging tailwind classes"
+
+images:
+  - path: "artifacts/autobuilder-ai/public/images/hero-mesh.png"
+    description: "Abstract futuristic 3D wireframe mesh background in dark space with glowing electric blue and violet neon lights, premium tech SaaS style"
+    aspect_ratio: "16:9"
+  - path: "artifacts/autobuilder-ai/public/images/avatar.png"
+    description: "Futuristic stylish 3D avatar of a tech user with neon lighting"
+    aspect_ratio: "1:1"
+
+notes:
+  - The API schema has been read, and the frontend maps strictly to its types (exe, apk, both targets; frontend, backend, fullstack projects).
+  - Uses polling on build detail pages when build status is 'building' or 'pending'.

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "AutoBuilder AI"
+version = "1.0.0"
+id = "artifacts/autobuilder-ai"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18391
+
+[services.development]
+run = "pnpm --filter @workspace/autobuilder-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/autobuilder-ai", "run", "build" ]
+publicDir = "artifacts/autobuilder-ai/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18391"
+BASE_PATH = "/"
