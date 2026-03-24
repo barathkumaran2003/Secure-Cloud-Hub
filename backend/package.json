@@ -1,0 +1,31 @@
+{
+  "name": "autobuilder-ai-backend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx ./src/index.ts",
+    "dev": "tsx watch ./src/index.ts",
+    "build": "esbuild src/index.ts --bundle --platform=node --outfile=dist/index.cjs --format=cjs"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "drizzle-orm": "^0.43.1",
+    "drizzle-zod": "^0.7.0",
+    "express": "^5.1.0",
+    "pg": "^8.14.1",
+    "pino": "^9.6.0",
+    "pino-http": "^10.4.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.15.29",
+    "@types/pg": "^8.11.13",
+    "esbuild": "^0.27.3",
+    "pino-pretty": "^13.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.8.3"
+  }
+}

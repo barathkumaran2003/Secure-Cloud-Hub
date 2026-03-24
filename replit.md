@@ -6,35 +6,84 @@ AutoBuilder AI — A production-grade SaaS web platform that allows users to upl
 
 ## Stack
 
-- **Monorepo tool**: pnpm workspaces
-- **Node.js version**: 24
-- **Package manager**: pnpm
-- **TypeScript version**: 5.9
-- **Frontend**: React + Vite, Tailwind CSS, Framer Motion, Lucide React, Recharts
-- **API framework**: Express 5
+- **Frontend**: React 19 + Vite 6, Tailwind CSS 4, Framer Motion, Lucide React, Recharts — standalone npm project
+- **Backend**: Node.js 24 + Express 5 — standalone npm project
 - **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+- **Validation**: Zod
+- **Package manager**: npm (both frontend and backend are independent)
 
 ## Structure
 
 ```text
-artifacts-monorepo/
-├── artifacts/
-│   ├── api-server/         # Express API server (routes: health, projects, builds)
-│   └── autobuilder-ai/     # React + Vite frontend SaaS app
-├── lib/
-│   ├── api-spec/           # OpenAPI spec + Orval codegen config
-│   ├── api-client-react/   # Generated React Query hooks
-│   ├── api-zod/            # Generated Zod schemas from OpenAPI
-│   └── db/                 # Drizzle ORM schema + DB connection
-├── scripts/
-│   └── src/seed.ts         # DB seeding script
-├── pnpm-workspace.yaml
-├── tsconfig.base.json
-├── tsconfig.json
-└── package.json
+project/
+├── frontend/                # Standalone React + Vite frontend (npm)
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── tsconfig.json
+│   ├── index.html
+│   └── src/
+│       ├── App.tsx
+│       ├── main.tsx
+│       ├── index.css
+│       ├── components/      # GlowingButton, GlassCard, StatusBadge, Layout + shadcn/ui
+│       ├── pages/           # Landing, Dashboard, Projects, ProjectDetails, BuildDetails, Settings
+│       ├── hooks/           # use-projects-api, use-builds-api, use-toast, use-mobile
+│       └── lib/
+│           ├── utils.ts
+│           └── api-client/  # Inlined API client (React Query hooks + TypeScript types)
+│               ├── index.ts
+│               ├── custom-fetch.ts
+│               └── generated/
+│                   ├── api.ts        # React Query hooks for all endpoints
+│                   └── api.schemas.ts # TypeScript types
+├── backend/                 # Standalone Express API server (npm)
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── src/
+│       ├── index.ts         # Entry point (PORT defaults to 5000)
+│       ├── app.ts           # Express app setup
+│       ├── lib/logger.ts
+│       ├── routes/          # health.ts, projects.ts, index.ts
+│       ├── db/              # Drizzle ORM (inlined)
+│       │   ├── index.ts
+│       │   └── schema/      # projects.ts, builds.ts
+│       └── validation/      # Zod schemas (index.ts)
+├── artifacts/               # Original pnpm monorepo artifacts (preserved)
+├── lib/                     # Original pnpm monorepo shared libraries (preserved)
+└── scripts/                 # DB seeding scripts
+```
+
+## Running the App
+
+### Backend
+```bash
+cd backend
+npm install
+npm start          # runs on PORT 5000 by default
+# or for dev with watch:
+npm run dev
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev        # runs on PORT 5173 by default, proxies /api to backend
+npm run build      # production build
+```
+
+### Environment Variables
+
+**Backend** (`.env` in `backend/`):
+```
+DATABASE_URL=postgresql://...
+PORT=5000          # optional, defaults to 5000
+```
+
+**Frontend**:
+```
+PORT=5173          # optional, defaults to 5173
+BACKEND_PORT=5000  # optional, used for /api proxy in dev
 ```
 
 ## Features
@@ -62,34 +111,12 @@ artifacts-monorepo/
 - `projects` — id, name, description, type, status, builds_count, last_build_status, timestamps
 - `builds` — id, project_id, status, target_platform, progress, logs, download_url, file_size, duration, timestamps
 
-## Packages
-
-### `artifacts/api-server` (`@workspace/api-server`)
-
-Express 5 API server. Routes: `health.ts`, `projects.ts` (projects + builds endpoints).
-
-### `artifacts/autobuilder-ai` (`@workspace/autobuilder-ai`)
-
-React + Vite SaaS frontend. Dark premium UI with:
-- `src/pages/` — Landing, Dashboard, Projects, ProjectDetails, BuildDetails, Settings
-- `src/components/` — GlowingButton, GlassCard, StatusBadge, Layout
-- `src/hooks/` — use-projects-api, use-builds-api
-
-### `lib/db` (`@workspace/db`)
-
-Schema: `projects.ts`, `builds.ts`
-
-Run migrations: `pnpm --filter @workspace/db run push`
-Seed data: `pnpm --filter @workspace/scripts run seed`
-
-### `lib/api-spec` (`@workspace/api-spec`)
-
-OpenAPI 3.1 spec with projects and builds endpoints. Run codegen: `pnpm --filter @workspace/api-spec run codegen`
-
-## TypeScript & Composite Projects
-
-Every package extends `tsconfig.base.json`. Run `pnpm run typecheck` from root.
-
 ## Build Simulation
 
 When a build is triggered, the backend simulates a 15-second build process with realistic progress stages and logs. After completion, a download URL is provided.
+
+## Notes
+
+- The original pnpm monorepo (`artifacts/`, `lib/`) is preserved for reference.
+- The frontend dev server proxies `/api/*` requests to the backend automatically.
+- No Replit-specific plugins (cartographer, runtime-error-modal) in the standalone version.
